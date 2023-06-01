@@ -1,10 +1,10 @@
-/******************************************************************************
- *                                                                            *
- * DECS.H                                                                     *
- *                                                                            *
- * GLOBAL MACROS, FUNCTION DEFINITIONS, INCLUDES, AND DECLARATIONS            *
- *                                                                            *
- ******************************************************************************/
+/*---------------------------------------------------------------------------------
+
+  DECS.H
+
+  -GLOBAL MACROS, FUNCTION DEFINITIONS, INCLUDES AND DECLARATIONS
+
+---------------------------------------------------------------------------------*/
 
 #pragma once
 
@@ -17,8 +17,8 @@
 
 #include <omp.h>
 
-// Required globally for pack.c function signatures
 #include <hdf5.h>
+
 
 #include "parameters.h"
 
@@ -32,9 +32,9 @@
 #define M_SQRT2 1.4142135623730950488016887242
 #endif
 
-/*******************************************************************************
-      COMPILE-TIME PARAMETERS :
-*******************************************************************************/
+/*---------------------------------------------------------------------------------
+                            COMPILE-TIME PARAMETERS
+---------------------------------------------------------------------------------*/
 
 #define VERSION "iharm-release-3.7"
 
@@ -152,7 +152,7 @@
 #define FACE2 (1)
 #define CORN  (2)
 #define CENT  (3)
-// TODO add option to force FACE3 axisymmetric?
+
 #define FACE3 (4)
 #define NPG   (5)
 
@@ -217,9 +217,9 @@
 #define NUM_TIMERS     (20)
 #endif
 
-/*******************************************************************************
-    GLOBAL TYPES
-*******************************************************************************/
+/*---------------------------------------------------------------------------------
+                                  GLOBAL TYPES
+---------------------------------------------------------------------------------*/
 typedef int    GridInt[N3+2*NG][N2+2*NG][N1+2*NG];
 typedef double GridDouble[N3+2*NG][N2+2*NG][N1+2*NG];
 typedef double GridVector[NDIM][N3+2*NG][N2+2*NG][N1+2*NG];
@@ -266,9 +266,9 @@ extern struct FluidFlux preserve_F;
 extern GridPrim preserve_dU;
 #endif
 
-/*******************************************************************************
-    GLOBAL VARIABLES SECTION
-*******************************************************************************/
+/*---------------------------------------------------------------------------------
+                              GLOBAL VARIABLES SECTION
+---------------------------------------------------------------------------------*/
 
 // Physics parameters
 extern double a;
@@ -298,7 +298,7 @@ extern double tdump, tlog;
 // Diagnostics
 extern double mdot, edot, ldot;
 extern double mdot_eh, edot_eh, ldot_eh;
-extern int icurr, jcurr, kcurr;
+extern int icurr, jcurr, kcure;
 
 // Parallelism
 extern int nthreads;
@@ -317,14 +317,12 @@ extern double tptemin, tptemax;
 
 extern double poly_norm, poly_xt, poly_alpha, mks_smooth;
 
-
-// MPI-specific stuff
 extern int global_start[3];
 extern int global_stop[3];
 
-/*******************************************************************************
-    MACROS
-*******************************************************************************/
+/*---------------------------------------------------------------------------------
+                                  MACROS
+---------------------------------------------------------------------------------*/
 #define ILOOP	\
   for (int i = 0 + NG; i < N1 + NG; i++)
 #define ILOOPALL \
@@ -347,13 +345,13 @@ extern int global_stop[3];
 #define ZLOOP_TRANSPOSE \
   ILOOPALL JLOOPALL KLOOPALL
 
-#define ISLOOP(istart,istop) \
+#define ISLOOP(istart, istop) \
   for (int i = (istart) + NG; i <= (istop) + NG; i++)
-#define JSLOOP(jstart,jstop) \
+#define JSLOOP(jstart, jstop) \
   for (int j = (jstart) + NG; j <= (jstop) + NG; j++)
-#define KSLOOP(kstart,kstop) \
+#define KSLOOP(kstart, kstop) \
   for (int k = (kstart) + NG; k <= (kstop) + NG; k++)
-#define ZSLOOP(kstart,kstop,jstart,jstop,istart,istop) \
+#define ZSLOOP(kstart, kstop, jstart, jstop, istart, istop) \
   for (int k = (kstart) + NG; k <= (kstop) + NG; k++) \
   for (int j = (jstart) + NG; j <= (jstop) + NG; j++) \
   for (int i = (istart) + NG; i <= (istop) + NG; i++)
@@ -361,8 +359,8 @@ extern int global_stop[3];
   for (int k = (kstop) + NG; k >= (kstart) + NG; k--) \
   for (int j = (jstop) + NG; j >= (jstart) + NG; j--) \
   for (int i = (istop) + NG; i >= (istart) + NG; i--)
-#define ZSLOOP_OUT(kstart,kstop,jstart,jstop,istart,istop) \
-  ISLOOP(istart,istop) JSLOOP(jstart,jstop) KSLOOP(kstart,kstop)
+#define ZSLOOP_OUT(kstart, kstop, jstart, jstop, istart, istop) \
+  ISLOOP(istart, istop) JSLOOP(jstart, jstop) KSLOOP(kstart, kstop)
 
 // Loop over primitive variables
 #define PLOOP for(int ip = 0; ip < NVAR; ip++)
@@ -391,11 +389,11 @@ extern int global_stop[3];
 // FLAG macros are scattered through the code.  One can place a crude "watch" on a var
 // by printing it here -- it will be printed several times during a step.
 // eg add double sig_max = mpi_max(sigma_max(G, Stmp)); if(mpi_io_proc()) fprintf(stderr,"sig_max = %f\n",sig_max);
-#define FLAG(msg) if(DEBUG) { LOG(msg); mpi_barrier(); }
+#define FLAG(msg) if(DEBUG) {LOG(msg);}
 
-/*******************************************************************************
-    FUNCTION DECLARATIONS
-*******************************************************************************/
+/*---------------------------------------------------------------------------------
+                                FUNCTION DECLARATIONS
+---------------------------------------------------------------------------------*/
 // bl_coord.c
 void bl_coord(const double X[NDIM], double *r, double *th);
 
@@ -411,7 +409,7 @@ void gcov_func(double *X, double gcov[NDIM][NDIM]);
 void set_dxdX(double X[NDIM], double dxdX[NDIM][NDIM]);
 void set_points();
 void set_grid(struct GridGeom *G);
-void set_grid_loc(struct GridGeom *G, int i, int j, int k, int loc);
+void set_grid_loc(struct GridGeom *G, int i, int j, int loc);
 void zero_arrays();
 
 // current.c
@@ -440,6 +438,10 @@ void heat_electrons(struct GridGeom *G, struct FluidState *Sh, struct FluidState
 void fixup_electrons(struct FluidState *S);
 #endif
 
+#if BLAND
+void mag_source(struct GridGeom *G, struct FluidState *S, double dt);
+#endif
+
 // fixup.c
 void fixup(struct GridGeom *G, struct FluidState *S);
 void fixup_utoprim(struct GridGeom *G, struct FluidState *S);
@@ -447,8 +449,6 @@ void fixup_utoprim(struct GridGeom *G, struct FluidState *S);
 // fluxes.c
 double get_flux(struct GridGeom *G, struct FluidState *S, struct FluidFlux *F);
 void flux_ct(struct FluidFlux *F);
-
-// hdf5_utils.c has its own header
 
 // io.c
 void init_io();
@@ -462,9 +462,9 @@ void get_gcov(struct GridGeom *G, int i, int j, int loc, double gcov[NDIM][NDIM]
 void get_gcon(struct GridGeom *G, int i, int j, int loc, double gcon[NDIM][NDIM]);
 void conn_func(struct GridGeom *G, int i, int j, int k);
 void lower_grid(GridVector vcon, GridVector vcov, struct GridGeom *G, int i,
-  int j, int k, int loc);
+ int j, int k, int loc);
 void raise_grid(GridVector vcov, GridVector vcon, struct GridGeom *G, int i,
-  int j, int k, int loc);
+ int j, int k, int loc);
 void lower(double ucon[NDIM], double gcov[NDIM][NDIM], double ucov[NDIM]);
 void raise(double ucov[NDIM], double gcon[NDIM][NDIM], double ucon[NDIM]);
 double dot_grid(GridVector vcon, GridVector vcov, int i, int j, int k);
@@ -553,4 +553,4 @@ void report_performance();
 
 // u_to_p.c
 int U_to_P(struct GridGeom *G, struct FluidState *S, int i, int j, int k,
-  int loc);
+ int loc);

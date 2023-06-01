@@ -1,24 +1,17 @@
-/******************************************************************************
- *                                                                            *
- * STEP.C                                                                     *
- *                                                                            *
- * ADVANCES SIMULATION BY ONE TIMESTEP                                        *
- *                                                                            *
- ******************************************************************************/
+// 3D Blandford
 
 #include "decs.h"
 
 // Declarations
-double advance_fluid(struct GridGeom *G, struct FluidState *Si,
-  struct FluidState *Ss, struct FluidState *Sf, double Dt);
+double advance_fluid(struct GridGeom *G, struct FluidState *Si, struct FluidState *Ss, struct FluidState *Sf, double Dt);
 
 void step(struct GridGeom *G, struct FluidState *S)
 {
   static struct FluidState *Stmp;
   static struct FluidState *Ssave;
-
   static int first_call = 1;
-  if (first_call) {
+  if (first_call) 
+  {
     Stmp = calloc(1,sizeof(struct FluidState));
     Ssave = calloc(1,sizeof(struct FluidState));
     first_call = 0;
@@ -26,7 +19,6 @@ void step(struct GridGeom *G, struct FluidState *S)
 
   // Need both P_n and P_n+1 to calculate current
   // Work around ICC 18.0.2 bug in assigning to pointers to structs
-  // TODO use pointer tricks to avoid deep copy on both compilers
 #if INTEL_WORKAROUND
   memcpy(&(Ssave->P),&(S->P),sizeof(GridPrim));
 #else
@@ -35,12 +27,10 @@ void step(struct GridGeom *G, struct FluidState *S)
 #endif
   LOGN("Step %d",nstep);
   FLAG("Start step");
-  // TODO add back well-named flags /after/ events
 
   // Predictor setup
   advance_fluid(G, S, S, Stmp, 0.5*dt);
   FLAG("Advance Fluid Tmp");
-
 #if ELECTRONS
   heat_electrons(G, S, Stmp);
   FLAG("Heat Electrons Tmp");
@@ -53,7 +43,6 @@ void step(struct GridGeom *G, struct FluidState *S)
   fixup_electrons(Stmp);
   FLAG("Fixup e- Tmp");
 #endif
-  // Need an MPI call _before_ fixup_utop to obtain correct pflags
   set_bounds(G, Stmp);
   FLAG("First bounds Tmp");
   fixup_utoprim(G, Stmp);
@@ -80,6 +69,10 @@ void step(struct GridGeom *G, struct FluidState *S)
   FLAG("First bounds Full");
   fixup_utoprim(G, S);
   FLAG("Fixup U_to_P Full");
+  #if ( BLAND )
+    mag_source(G, S, dt);
+  #endif
+  
   set_bounds(G, S);
   FLAG("Second bounds Full");
 
@@ -113,14 +106,14 @@ void step(struct GridGeom *G, struct FluidState *S)
 
 }
 
-inline double advance_fluid(struct GridGeom *G, struct FluidState *Si,
-  struct FluidState *Ss, struct FluidState *Sf, double Dt)
+inline double advance_fluid(struct GridGeom *G, struct FluidState *Si, struct FluidState *Ss, struct FluidState *Sf, double Dt)
 {
   static GridPrim *dU;
   static struct FluidFlux *F;
 
   static int firstc = 1;
-  if (firstc) {
+  if (firstc) 
+  {
     dU = calloc(1,sizeof(GridPrim));
     F = calloc(1,sizeof(struct FluidFlux));
     firstc = 0;
@@ -136,28 +129,15 @@ inline double advance_fluid(struct GridGeom *G, struct FluidState *Si,
 
   double ndt = get_flux(G, Ss, F);
 
-//  update_f(F, dU);
-//  FLAG("Got initial fluxes");
-
 #if METRIC == MKS
   fix_flux(F);
 #endif
 
-//  update_f(F, dU);
-//  FLAG("Fixed Flux");
-
   //Constrained transport for B
   flux_ct(F);
 
-//  update_f(F, dU);
-//  FLAG("CT Step");
-
   // Flux diagnostic globals
-  // TODO don't compute every step, only for logs?
   diag_flux(F);
-
-//  update_f(F, dU);
-//  FLAG("Flux Diags");
 
   // Update Si to Sf
   timer_start(TIMER_UPDATE_U);
@@ -204,4 +184,23 @@ inline double advance_fluid(struct GridGeom *G, struct FluidState *Si,
   }
 
   return ndt;
+  }
+
+void mag_source(struct GridGeom *G, struct FluidState *S, double dt)
+{
+    int i, j, k;
+    double r, th;
+    double X[NDIM];
+    /* parameters of the magnetic field addition model */
+    double cthwid = .1;  /* how wide a cone is the field addition region */
+    double rate = 0.05;  /* dimensionless field addition rate */
+    double bchar = 1.;  /* characteristic field strength */
+    double fac = -2.76/(cthwid*cthwid); /*conversion from FWHM to 1/(2 stdev^2)*/
+    double add = 0;
+    ZLOOP {
+        coord(i, j,, k CENT, X);
+        bl_coord(X, &r, &th);
+        S->P[B1][k][j][i] += (exp(th*th*fac)-exp((M_PI-th)*(M_PI-th)*fac))*rate*dt*bchar/G->gdet[CENT][k][j][i];
+        /* done! */
+    }
 }
