@@ -409,7 +409,7 @@ void gcov_func(double *X, double gcov[NDIM][NDIM]);
 void set_dxdX(double X[NDIM], double dxdX[NDIM][NDIM]);
 void set_points();
 void set_grid(struct GridGeom *G);
-void set_grid_loc(struct GridGeom *G, int i, int j, int loc);
+void set_grid_loc(struct GridGeom *G, int i, int j, int k, int loc);
 void zero_arrays();
 
 // current.c

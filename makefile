@@ -7,13 +7,13 @@ HDF5_DIR =
 # Highly recommended to use mpicc!
 MPI_DIR =
 # Top directory of GSL, or blank if installed to system
-GSL_DIR =
+GSL_DIR = /opt/local
 # System /lib equivalent (can be /usr/lib, /lib64, /usr/lib64)
 # Can leave this blank if it's included automatically by GCC
-SYSTEM_LIBDIR = /lib64
+SYSTEM_LIBDIR = /opt/local
 
 # Try pointing this to h5pcc on your machine, before hunting down libraries
-CC=h5pcc
+CC=gcc
 # Example CFLAGS for going fast with GCC
 CFLAGS = -std=gnu99 -O3 -march=native -mtune=native -flto -fopenmp -funroll-loops
 MATH_LIB = -lm
