@@ -298,7 +298,7 @@ extern double tdump, tlog;
 // Diagnostics
 extern double mdot, edot, ldot;
 extern double mdot_eh, edot_eh, ldot_eh;
-extern int icurr, jcurr, kcure;
+extern int icurr, jcurr, kcurr;
 
 // Parallelism
 extern int nthreads;
@@ -389,7 +389,7 @@ extern int global_stop[3];
 // FLAG macros are scattered through the code.  One can place a crude "watch" on a var
 // by printing it here -- it will be printed several times during a step.
 // eg add double sig_max = mpi_max(sigma_max(G, Stmp)); if(mpi_io_proc()) fprintf(stderr,"sig_max = %f\n",sig_max);
-#define FLAG(msg) if(DEBUG) {LOG(msg);}
+#define FLAG(msg) if(DEBUG) {LOG(msg); mpi_barrier(); }
 
 /*---------------------------------------------------------------------------------
                                 FUNCTION DECLARATIONS

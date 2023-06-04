@@ -200,7 +200,7 @@ void mag_source(struct GridGeom *G, struct FluidState *S, double dt)
     ZLOOP {
         coord(i, j, k, CENT, X);
         bl_coord(X, &r, &th);
-        S->P[B1][k][j][i] += (exp(th*th*fac)-exp((M_PI-th)*(M_PI-th)*fac))*rate*dt*bchar/G->gdet[CENT][k][j][i];
+        S->P[B1][k][j][i] += (exp(th*th*fac)-exp((M_PI-th)*(M_PI-th)*fac))*rate*dt*bchar/G->gdet[CENT][j][i];
         /* done! */
     }
 }
