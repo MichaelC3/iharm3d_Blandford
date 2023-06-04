@@ -21,7 +21,7 @@
  *   MINKOWSKI, MKS
  */
 #define METRIC MKS
-#define DEREFINE_POLES 1
+#define DEREFINE_POLES 0
 
 /*
  * FLOORS
@@ -38,6 +38,7 @@
  */
 #define ELECTRONS           1
 #define ALLMODELS           1   // Flag for enabling all models
+#define BLAND               1   // Blandford model
 #define SUPPRESS_HIGHB_HEAT 1
 #define BETA_HEAT           1
 
