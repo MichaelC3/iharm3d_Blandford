@@ -21,7 +21,6 @@ double gamma_func(double Bsq, double D, double QdB, double Qtsq, double Wp,
   int *eflag);
 double Wp_func(struct GridGeom *G, struct FluidState *S, int i, int j, int k,
   int loc, int *eflag);
-
 int U_to_P(struct GridGeom *G, struct FluidState *S, int i, int j, int k, 
   int loc)
 {
